@@ -29,8 +29,10 @@ co(function* () {
 
         if (argv.type === 'encrypt') {
             yield compressAndEncryptFile(filename, argv.password);
+             fs.unlinkSync(filename);
         }else if (argv.type === 'decrypt') {
             yield decryptAndUncompressFile(filename, argv.password);
+            fs.unlinkSync(filename);
         }else {
             throw new Error('Invalid type');
         }
