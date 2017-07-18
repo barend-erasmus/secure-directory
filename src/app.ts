@@ -52,7 +52,7 @@ function compressAndEncryptFile(filename: string, password: string): Promise<boo
 
         const gzip = zlib.createGzip();
 
-        const algorithm = 'aes-256-ctr';
+        const algorithm = 'aes-256-cbc';
         const encrypt = crypto.createCipher(algorithm, password);
 
         const inp = fs.createReadStream(filename);
@@ -75,11 +75,16 @@ function decryptAndUncompressFile(filename: string, password: string): Promise<b
 
         const gunzip = zlib.createGunzip();
 
-        const algorithm = 'aes-256-ctr';
+        const algorithm = 'aes-256-cbc';
         const decrypt = crypto.createDecipher(algorithm, password);
 
+        if (!filename.endsWith(`.gz.${algorithm}`)) {
+            resolve(false);
+            return;
+        }
+
         const inp = fs.createReadStream(filename);
-        const out = fs.createWriteStream(`${filename.replace(`.gz.${algorithm}`, '')}`);
+        const out = fs.createWriteStream(`${filename.substring(0, filename.length - `.gz.${algorithm}`.length)}`);
         
         inp.pipe(decrypt).pipe(gunzip).pipe(out);
 
