@@ -1,12 +1,23 @@
 # secure-directory
 
-```
+## Encrypt
 
-Usage: secure-directory [options]
+```
+Usage: secure-directory encrypt [options] <path-to-directory>
 
 Options:
-  -a, --password  password                                            [required]
-  -t, --type      encrypt or decrypt                                  [required]
-  -p, --path      path to directory                                   [required]
+  --help          Show help                                            [boolean]
+  -p, --password  password                                            [required]
+
+```
+
+## Decrypt
+
+```
+Usage: secure-directory decrypt [options] <path-to-directory>
+
+Options:
+  --help          Show help                                            [boolean]
+  -p, --password  password                                            [required]
 
 ```

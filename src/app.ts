@@ -4,40 +4,59 @@ import * as fs from 'fs';
 import * as recursive from 'recursive-readdir';
 import * as crypto from 'crypto';
 
-const argv = require('yargs')
-    .usage('Usage: $0 [options]')
-    .alias('p', 'path')
-    .describe('path', 'path to directory')
-    .demandOption('path')
-    .alias('a', 'password')
-    .describe('a', 'password')
-    .demandOption('password')
-    .alias('t', 'type')
-    .describe('t', 'encrypt or decrypt')
-    .demandOption('type')
+
+require('yargs')
+    .command('encrypt', 'Encrypt Directory', (yargs) => {
+        yargs
+            .usage('Usage: $0 encrypt [options] <path-to-directory>')
+            .alias('p', 'password')
+            .describe('p', 'password')
+            .demandOption('password')
+            .help();
+    }, (argv) => {
+        encrypt(argv)
+    })
+    .command('decrypt', 'Decrypt Directory', (yargs) => {
+        yargs
+            .usage('Usage: $0 decrypt [options] <path-to-directory>')
+            .alias('p', 'password')
+            .describe('p', 'password')
+            .demandOption('password')
+            .help();
+    }, (argv) => {
+        decrypt(argv)
+    })
+    .help()
     .argv;
 
 
-co(function* () {
+function encrypt(args) {
+    co(function* () {
 
-    const path = argv.path;
+        const path = args._[0];
 
-    const filenames: string[] = yield getFilenames(path);
+        const filenames: string[] = yield getFilenames(path);
 
-    for (const filename of filenames) {
-        console.log(filename);
-
-        if (argv.type === 'encrypt') {
-            yield compressAndEncryptFile(filename, argv.password);
-             fs.unlinkSync(filename);
-        }else if (argv.type === 'decrypt') {
-            yield decryptAndUncompressFile(filename, argv.password);
+        for (const filename of filenames) {
+            yield compressAndEncryptFile(filename, args.password);
             fs.unlinkSync(filename);
-        }else {
-            throw new Error('Invalid type');
         }
-    }
-});
+    });
+}
+
+function decrypt(args) {
+    co(function* () {
+
+        const path = args._[0];
+
+        const filenames: string[] = yield getFilenames(path);
+
+        for (const filename of filenames) {
+            yield decryptAndUncompressFile(filename, args.password);
+            fs.unlinkSync(filename);
+        }
+    });
+}
 
 function getFilenames(path: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
@@ -85,7 +104,7 @@ function decryptAndUncompressFile(filename: string, password: string): Promise<b
 
         const inp = fs.createReadStream(filename);
         const out = fs.createWriteStream(`${filename.substring(0, filename.length - `.gz.${algorithm}`.length)}`);
-        
+
         inp.pipe(decrypt).pipe(gunzip).pipe(out);
 
         out.on('finish', () => {
