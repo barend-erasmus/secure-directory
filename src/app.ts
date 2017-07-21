@@ -33,7 +33,7 @@ require('yargs')
 function encrypt(args) {
     co(function* () {
 
-        const path = args._[0];
+        const path = args._[1];
 
         const filenames: string[] = yield getFilenames(path);
 
@@ -47,7 +47,7 @@ function encrypt(args) {
 function decrypt(args) {
     co(function* () {
 
-        const path = args._[0];
+        const path = args._[1];
 
         const filenames: string[] = yield getFilenames(path);
 
