@@ -1,4 +1,10 @@
-# secure-directory
+# Secure Directory
+
+## Getting Started
+
+Install 'secure-directory' globally by running the following command.
+
+`npm install -g secure-directory`
 
 ## Encrypt
 
